@@ -1,6 +1,4 @@
-const express = require("express");
 
-const router = express.Router();
 
 // Playlist Model
 const PlaylistSchema = new mongoose.Schema({
@@ -16,4 +14,3 @@ const PlaylistSchema = new mongoose.Schema({
 
 const Playlist = mongoose.model('Playlist', PlaylistSchema);
 
-module.exports = router;

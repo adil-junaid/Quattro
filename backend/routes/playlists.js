@@ -1,5 +1,8 @@
+const express = require("express");
+const router = express.Router();
+
 // Playlists
-app.get('/api/playlists', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const playlists = await Playlist.find().populate('songs');
         res.json(playlists);
@@ -9,7 +12,7 @@ app.get('/api/playlists', async (req, res) => {
     }
 });
 
-app.get('/api/songs/:songId/audio', async (req, res) => {
+router.get('/api/songs/:songId/audio', async (req, res) => {
     try {
         const songId = req.params.songId;
 
@@ -24,7 +27,7 @@ app.get('/api/songs/:songId/audio', async (req, res) => {
             return res.status(404).json({ error: 'Song not found' });
         }
 
-        // Set the appropriate Content-Type header
+        // Set the routerropriate Content-Type header
         res.set('Content-Type', 'audio/wav');
         // Modify the Content-Type as per your file format
 
@@ -38,7 +41,7 @@ app.get('/api/songs/:songId/audio', async (req, res) => {
     }
 });
 
-app.get('/api/playlists/:playlistName/songs', async (req, res) => {
+router.get('/:playlistName/songs', async (req, res) => {
     try {
         const playlistName = req.params.playlistName;
         const playlist =
@@ -55,14 +58,14 @@ app.get('/api/playlists/:playlistName/songs', async (req, res) => {
     }
 });
 
-// Update the /api/playlists POST endpoint
-app.post('/api/playlists', async (req, res) => {
+// Update the playlist POST endpoint
+router.post('/', async (req, res) => {
     try {
         const { name, songs } = req.body;
 
-        // Find the ObjectId values of the 
+        // Find the ObjectId values of the
         // songs specified by their titles
-        const existingSongs = await Song.find({ title:{$in: songs} });
+        const existingSongs = await Song.find({ title: { $in: songs } });
         const songIds = existingSongs.map(song => song._id);
 
         // Validate if all songs were found
@@ -75,7 +78,7 @@ app.post('/api/playlists', async (req, res) => {
             return res.status(400)
                 .json(
                     {
-                        error: `One or more songs not found: 
+                        error: `One or more songs not found:
                                 ${missingSongs.join(', ')}`
                     });
         }
@@ -101,7 +104,7 @@ app.post('/api/playlists', async (req, res) => {
 });
 
 // Collaborative Playlists
-app.post('/api/playlists/:playlistId/collaborators',async(req,res) => {
+router.post('/:playlistId/collaborators', async (req, res) => {
     try {
         const { userId } = req.body;
         const playlist = await Playlist.findByIdAndUpdate(
@@ -116,7 +119,7 @@ app.post('/api/playlists/:playlistId/collaborators',async(req,res) => {
     }
 });
 
-app.get('/api/playlists/collaborative/:userId', async (req, res) => {
+router.get('/collaborative/:userId', async (req, res) => {
     try {
         const playlists =
             await Playlist.find({ collaborators: req.params.userId });
@@ -126,3 +129,5 @@ app.get('/api/playlists/collaborative/:userId', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
+module.exports = router;
