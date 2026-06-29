@@ -9,7 +9,10 @@ const SongSchema = new mongoose.Schema({
     fileId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "uploads.files"
+    },
+    uploadedBy: {
+        type: String,
+        required: true
     }
 });
-
 module.exports = mongoose.model("Song", SongSchema);
