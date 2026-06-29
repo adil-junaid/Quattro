@@ -1,11 +1,12 @@
+const multer = require("multer");
+const { GridFsStorage } = require("multer-gridfs-storage");
+
 const storage = new GridFsStorage({
-    url: 'mongodb://localhost:27017/musicdatabase',
-    file: (req, file) => {
-        return {
-            filename: file.originalname,
-            bucketName: 'uploads' // Bucket name in MongoDB
-        };
-    }
+    url: process.env.MONGO_URI,
+    file: (req, file) => ({
+        filename: `${Date.now()}-${file.originalname}`,
+        bucketName: "uploads"
+    })
 });
 
 const upload = multer({ storage });
