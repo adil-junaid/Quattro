@@ -67,4 +67,62 @@ router.post('/', async (req, res) => {
     }
 });
 
+//get song info from id
+router.get("/:id", async (req, res) => {
+    try {
+        const song = await Song.findById(req.params.id);
+
+        if (!song) {
+            return res.status(404).json({ error: "Song not found" });
+        }
+
+        res.json(song);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+//update song by id
+router.put("/:id", async (req, res) => {
+    try {
+        const song = await Song.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!song) {
+            return res.status(404).json({ error: "Song not found" });
+        }
+
+        res.json(song);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+//delete song by id
+router.delete("/:id", async (req, res) => {
+    try {
+        const song = await Song.findByIdAndDelete(req.params.id);
+
+        if (!song) {
+            return res.status(404).json({ error: "Song not found" });
+        }
+
+        res.json({
+            message: "Song deleted successfully"
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+
 module.exports = router;
