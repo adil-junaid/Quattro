@@ -1,3 +1,7 @@
+const express = require("express");
+
+const router = express.Router();
+
 const Song = mongoose.model('Song', new mongoose.Schema({
     title: { type: String, required: true },
     artist: { type: String, required: true },
@@ -7,3 +11,5 @@ const Song = mongoose.model('Song', new mongoose.Schema({
     fileId: { type: mongoose.Schema
                             .Types.ObjectId, ref: 'uploads.files' }
 }));
+
+module.exports = router;
