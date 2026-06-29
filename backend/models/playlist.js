@@ -1,9 +1,10 @@
-
+const mongoose = require("mongoose");
+const shortid = require("shortid");
 
 // Playlist Model
 const PlaylistSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    songs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Song' }],
+    songs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Song" }],
     playlistCode: {
         type: String,
         required: true,
@@ -12,5 +13,4 @@ const PlaylistSchema = new mongoose.Schema({
     }
 });
 
-const Playlist = mongoose.model('Playlist', PlaylistSchema);
-
+module.exports = mongoose.model("Playlist", PlaylistSchema);
