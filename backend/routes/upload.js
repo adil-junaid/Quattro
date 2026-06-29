@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const upload = require("../config/storage");
+const upload = require("../config/gridfs");
 
 router.post("/", upload.single("audioFile"), (req, res) => {
     console.log("Upload route reached");
