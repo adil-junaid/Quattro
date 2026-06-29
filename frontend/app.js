@@ -14,5 +14,4 @@ function App() {
     );
 }
 
-//useless message
 export default App;
