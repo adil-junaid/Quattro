@@ -8,6 +8,7 @@ const connectDB = require("./config/db");
 // Routes
 const playlistRoutes = require("./routes/playlists");
 const songRoutes = require("./routes/songs");
+const uploadRoutes = require("./routes/upload");
 
 // Middleware
 const errorMiddleware = require("./middleware/errorMiddleware");
@@ -24,6 +25,7 @@ app.use(express.json());
 // Routes
 app.use("/api/playlists", playlistRoutes);
 app.use("/api/songs", songRoutes);
+app.use("/api/upload", uploadRoutes);
 
 // Error Handler
 app.use(errorMiddleware);
@@ -40,14 +42,4 @@ app.use(errorMiddleware);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}\n`);
-
-    console.log("GET    http://localhost:" + PORT + "/api/playlists");
-    console.log("POST   http://localhost:" + PORT + "/api/playlists");
-    console.log("GET    http://localhost:" + PORT + "/api/playlists/:playlistName/songs");
-    console.log("POST   http://localhost:" + PORT + "/api/playlists/:playlistId/collaborators");
-    console.log("GET    http://localhost:" + PORT + "/api/playlists/collaborative/:userId");
-
-    console.log("GET    http://localhost:" + PORT + "/api/songs");
-    console.log("POST   http://localhost:" + PORT + "/api/songs");
-    console.log("GET    http://localhost:" + PORT + "/api/songs/:songId/audio");
 });
