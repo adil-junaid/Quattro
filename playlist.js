@@ -112,7 +112,7 @@ function PlaylistList() {
                 Create Playlist
             </button>
         </div>
-    );
+    ); 
 }
 
 export default PlaylistList;
