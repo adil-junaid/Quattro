@@ -1,16 +1,48 @@
 const express = require("express");
 const router = express.Router();
 
-const upload = require("../config/gridfs");
+const upload = require("../middleware/uploadMiddleware");
+const getBucket = require("../config/gridfs");
 
 router.post("/", upload.single("audioFile"), (req, res) => {
-    console.log("Upload route reached");
-    console.log(req.file);
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                error: "No file uploaded."
+            });
+        }
 
-    res.json({
-        message: "Upload successful",
-        fileId: req.file.id
-    });
+        const bucket = getBucket();
+
+        const uploadStream = bucket.openUploadStream(
+            req.file.originalname,
+            {
+                contentType: req.file.mimetype
+            }
+        );
+
+        uploadStream.end(req.file.buffer);
+
+        uploadStream.on("finish", () => {
+            res.status(201).json({
+                message: "Upload successful",
+                fileId: uploadStream.id
+            });
+        });
+
+        uploadStream.on("error", (err) => {
+            console.error(err);
+            res.status(500).json({
+                error: "Upload failed."
+            });
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            error: "Server error."
+        });
+    }
 });
 
 module.exports = router;
