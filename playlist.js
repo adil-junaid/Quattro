@@ -89,3 +89,30 @@ function PlaylistList() {
                                                 <li key={song._id}>
                                                     {song.title}
                                                 </li>
+                                            ))
+                                        }
+                                    </ul>
+                                </div>
+                            )
+                        }
+                    </li>
+                ))}
+            </ul>
+            <input
+                type="text"
+                placeholder="Enter playlist name"
+                value={newPlaylistName}
+                onChange={e => setNewPlaylistName(e.target.value)} />
+            <input
+                type="text"
+                placeholder="Enter songs (separated by commas)"
+                value={newPlaylistSongs.join(',')}
+                onChange={e => setNewPlaylistSongs(e.target.value.split(','))} />
+            <button onClick={handleCreatePlaylist}>
+                Create Playlist
+            </button>
+        </div>
+    );
+}
+
+export default PlaylistList;
