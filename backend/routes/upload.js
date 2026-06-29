@@ -21,8 +21,6 @@ router.post("/", upload.single("audioFile"), (req, res) => {
             }
         );
 
-        uploadStream.end(req.file.buffer);
-
         uploadStream.on("finish", () => {
             res.status(201).json({
                 message: "Upload successful",
@@ -32,13 +30,17 @@ router.post("/", upload.single("audioFile"), (req, res) => {
 
         uploadStream.on("error", (err) => {
             console.error(err);
+
             res.status(500).json({
                 error: "Upload failed."
             });
         });
 
+        uploadStream.end(req.file.buffer);
+
     } catch (err) {
         console.error(err);
+
         res.status(500).json({
             error: "Server error."
         });
