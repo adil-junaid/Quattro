@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/clerk-react";
 
-const HAS_CLERK = !!process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+const HAS_CLERK = !!process.env.REACT_APP_CLERK_PUBLISHABLE_KEY && !process.env.REACT_APP_CLERK_PUBLISHABLE_KEY.includes("...");
 
 function Navbar() {
     const location = useLocation();

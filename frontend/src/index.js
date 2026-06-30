@@ -4,7 +4,7 @@ import './App.css';
 import App from './app';
 import { ClerkProvider } from '@clerk/clerk-react';
 
-const PUBLISHABLE_KEY = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+const PUBLISHABLE_KEY = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY && !process.env.REACT_APP_CLERK_PUBLISHABLE_KEY.includes("...") ? process.env.REACT_APP_CLERK_PUBLISHABLE_KEY : null;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
