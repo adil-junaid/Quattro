@@ -20,7 +20,10 @@ const app = express();
 connectDB();
 
 // Global Middleware
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5174",
+    credentials: true
+}));
 app.use(express.json());
 app.use(clerkMiddleware());
 

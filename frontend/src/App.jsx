@@ -24,10 +24,11 @@ import "./App.css";
 
 function AuthSync() {
   const { getToken } = useAuth();
-
+  
   useEffect(() => {
     const syncToken = async () => {
       const token = await getToken();
+      console.log("TOKEN:", token);
       setAuthToken(token);
     };
 

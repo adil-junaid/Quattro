@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { requireAuth } = require("@clerk/express");
+
+const { requireAuth, getAuth } = require("@clerk/express");
 
 const Playlist = require("../models/playlist");
 const Song = require("../models/song");
@@ -9,27 +10,34 @@ const { ObjectId } = require("mongodb");
 // Get all playlists
 router.get("/", requireAuth(), async (req, res) => {
     try {
+        const { userId } = getAuth(req);
+
         const playlists = await Playlist.find({
-            owner: req.auth.userId
+            owner: userId
         }).populate("songs");
+
         res.json(playlists);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Server error" });
+        res.status(500).json({
+            error: "Server error"
+        });
     }
 });
 
 // Get songs in a playlist
 router.get("/:playlistName/songs", requireAuth(), async (req, res) => {
     try {
+        const { userId } = getAuth(req);
+
         const playlist = await Playlist.findOne({
             name: req.params.playlistName,
-            owner: req.auth.userId
+            owner: userId
         }).populate("songs");
 
         if (!playlist) {
             return res.status(404).json({
-                error: "Playlist not found",
+                error: "Playlist not found"
             });
         }
 
@@ -37,15 +45,15 @@ router.get("/:playlistName/songs", requireAuth(), async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            error: "Server error",
+            error: "Server error"
         });
     }
 });
 
 // Create playlist
-// Create playlist
 router.post("/", requireAuth(), async (req, res) => {
     try {
+        const { userId } = getAuth(req);
         const { name, songs = [] } = req.body;
 
         let songIds = [];
@@ -55,7 +63,7 @@ router.post("/", requireAuth(), async (req, res) => {
                 title: { $in: songs }
             });
 
-            songIds = existingSongs.map((song) => song._id);
+            songIds = existingSongs.map(song => song._id);
 
             if (existingSongs.length !== songs.length) {
                 return res.status(400).json({
@@ -67,7 +75,7 @@ router.post("/", requireAuth(), async (req, res) => {
         const playlist = new Playlist({
             name,
             songs: songIds,
-            owner: req.auth.userId
+            owner: userId
         });
 
         await playlist.save();
@@ -82,22 +90,28 @@ router.post("/", requireAuth(), async (req, res) => {
     }
 });
 
-
 // Add song to playlist
 router.put("/:playlistId/add-song", requireAuth(), async (req, res) => {
     try {
+        const { userId } = getAuth(req);
         const { songId } = req.body;
+
         if (!ObjectId.isValid(req.params.playlistId)) {
-            return res.status(400).json({ error: "Invalid playlist ID" });
+            return res.status(400).json({
+                error: "Invalid playlist ID"
+            });
         }
+
         if (!ObjectId.isValid(songId)) {
-            return res.status(400).json({ error: "Invalid song ID" });
+            return res.status(400).json({
+                error: "Invalid song ID"
+            });
         }
 
         const playlist = await Playlist.findOneAndUpdate(
             {
                 _id: req.params.playlistId,
-                owner: req.auth.userId
+                owner: userId
             },
             {
                 $addToSet: {
@@ -110,19 +124,26 @@ router.put("/:playlistId/add-song", requireAuth(), async (req, res) => {
         ).populate("songs");
 
         if (!playlist) {
-            return res.status(404).json({ error: "Playlist not found" });
+            return res.status(404).json({
+                error: "Playlist not found"
+            });
         }
 
         res.json(playlist);
+
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Server error" });
+        res.status(500).json({
+            error: "Server error"
+        });
     }
 });
 
 // Delete playlist
 router.delete("/:playlistId", requireAuth(), async (req, res) => {
     try {
+        const { userId } = getAuth(req);
+
         if (!ObjectId.isValid(req.params.playlistId)) {
             return res.status(400).json({
                 error: "Invalid playlist ID"
@@ -131,7 +152,7 @@ router.delete("/:playlistId", requireAuth(), async (req, res) => {
 
         const playlist = await Playlist.findOneAndDelete({
             _id: req.params.playlistId,
-            owner: req.auth.userId
+            owner: userId
         });
 
         if (!playlist) {

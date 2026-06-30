@@ -34,14 +34,17 @@ function Songs() {
     }
   };
 
-  const fetchPlaylists = async () => {
-    try {
-      const res = await api.get("/playlists");
-      setPlaylists(res.data);
-    } catch (err) {
-      console.error("Error fetching playlists:", err);
-    }
-  };
+    const fetchPlaylists = async () => {
+      try {
+        const res = await api.get("/playlists");
+
+        console.log("Playlists response:", res.data);
+
+        setPlaylists(res.data);
+      } catch (err) {
+        console.error("Error fetching playlists:", err);
+      }
+    };
 
   const handleAddToPlaylist = async (songId, playlistId) => {
     if (!playlistId) return;
