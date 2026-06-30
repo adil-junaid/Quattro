@@ -7,12 +7,21 @@ const getBucket = require("../config/gridfs");
 
 // Songs
 router.get('/', async (req, res) => {
+    console.log(req.query);
     try {
-        const { title, artist, album } = req.query;
-        const filter = {};
-        if (title) filter.title = new RegExp(title, 'i');
-        if (artist) filter.artist = new RegExp(artist, 'i');
-        if (album) filter.album = new RegExp(album, 'i');
+        const { search } = req.query;
+
+        let filter = {};
+
+        if (search) {
+            filter = {
+                $or: [
+                    { title: new RegExp(search, "i") },
+                    { artist: new RegExp(search, "i") },
+                    { album: new RegExp(search, "i") }
+                ]
+            };
+        }
 
         const songs = await Song.find(filter);
         res.json(songs);

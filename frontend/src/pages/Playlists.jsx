@@ -11,6 +11,18 @@ function Playlists() {
     fetchPlaylists();
   }, []);
 
+  const deletePlaylist = async (playlistId) => {
+  try {
+    await api.delete(`/playlists/${playlistId}`);
+
+    setPlaylists((prev) =>
+      prev.filter((playlist) => playlist._id !== playlistId)
+    );
+  } catch (err) {
+    console.error(err);
+  }
+};
+
   const fetchPlaylists = async () => {
     try {
       const res = await api.get("/playlists");
@@ -40,6 +52,17 @@ function Playlists() {
               className="playlist-card"
             >
               <h2>{playlist.name}</h2>
+
+              <button
+                className="delete-playlist-btn"
+                onClick={() => {
+                  if (window.confirm(`Delete "${playlist.name}"?`)) {
+                    deletePlaylist(playlist._id);
+                  }
+                }}
+              >
+                Delete
+              </button>
 
               <p>
                 <strong>Total Songs:</strong>{" "}

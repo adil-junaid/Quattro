@@ -143,4 +143,35 @@ router.put("/:playlistId/add-song", async (req, res) => {
     }
 });
 
+// Delete playlist
+router.delete("/:playlistId", async (req, res) => {
+    try {
+        if (!ObjectId.isValid(req.params.playlistId)) {
+            return res.status(400).json({
+                error: "Invalid playlist ID"
+            });
+        }
+
+        const playlist = await Playlist.findByIdAndDelete(
+            req.params.playlistId
+        );
+
+        if (!playlist) {
+            return res.status(404).json({
+                error: "Playlist not found"
+            });
+        }
+
+        res.json({
+            message: "Playlist deleted successfully"
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            error: "Server error"
+        });
+    }
+});
+
 module.exports = router;
