@@ -22,6 +22,7 @@ connectDB();
 // Global Middleware
 app.use(cors());
 app.use(express.json());
+app.use(clerkMiddleware());
 
 // Routes
 app.use("/api/playlists", playlistRoutes);
@@ -39,7 +40,6 @@ app.get("/", (req, res) => {
 // Start Server
 const PORT = process.env.PORT || 5000;
 
-app.use(errorMiddleware);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}\n`);

@@ -3,7 +3,11 @@ import {
   SignedIn,
   SignedOut,
   RedirectToSignIn,
+  useAuth,
 } from "@clerk/clerk-react";
+
+import { useEffect } from "react";
+import { setAuthToken } from "./services/api";
 
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
@@ -17,6 +21,21 @@ import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 
 import "./App.css";
+
+function AuthSync() {
+  const { getToken } = useAuth();
+
+  useEffect(() => {
+    const syncToken = async () => {
+      const token = await getToken();
+      setAuthToken(token);
+    };
+
+    syncToken();
+  }, [getToken]);
+
+  return null;
+}
 
 function ProtectedApp() {
   return (
@@ -56,6 +75,7 @@ function App() {
         element={
           <>
             <SignedIn>
+              <AuthSync />
               <ProtectedApp />
             </SignedIn>
 

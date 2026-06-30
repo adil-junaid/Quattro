@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { requireAuth } = require("@clerk/express");
 
 const Playlist = require("../models/playlist");
 const Song = require("../models/song");
@@ -39,7 +40,7 @@ router.get("/:playlistName/songs", async (req, res) => {
 });
 
 // Create playlist
-router.post("/", async (req, res) => {
+router.post("/", requireAuth(), async (req, res) => {
     try {
         const { name, songs = [] } = req.body;
 
