@@ -21,7 +21,7 @@ connectDB();
 
 // Global Middleware
 app.use(cors({
-    origin: "http://localhost:5174",
+    origin: "http://34.60.148.8:4173",
     credentials: true
 }));
 app.use(express.json());
