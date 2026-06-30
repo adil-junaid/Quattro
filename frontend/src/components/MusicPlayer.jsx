@@ -85,7 +85,7 @@ export default function MusicPlayer() {
     <div className="player">
       <audio
         ref={audioRef}
-        src={`http://localhost:5000/api/songs/${currentSong._id}/audio`}
+        src={`http://34.60.148.8:5000/api/songs/${currentSong._id}/audio`}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={nextSong}
