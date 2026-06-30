@@ -1,6 +1,7 @@
 import { FaMusic } from "react-icons/fa";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SignedIn, UserButton } from "@clerk/clerk-react";
 
 export default function Navbar() {
   const [search, setSearch] = useState("");
@@ -31,6 +32,10 @@ export default function Navbar() {
         onChange={(e) => setSearch(e.target.value)}
         onKeyDown={handleSearch}
       />
+
+      <SignedIn>
+        <UserButton afterSignOutUrl="/sign-in" />
+      </SignedIn>
     </nav>
   );
 }

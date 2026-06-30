@@ -1,4 +1,9 @@
 import { Routes, Route } from "react-router-dom";
+import {
+  SignedIn,
+  SignedOut,
+  RedirectToSignIn,
+} from "@clerk/clerk-react";
 
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
@@ -8,10 +13,12 @@ import Songs from "./pages/Songs";
 import Upload from "./pages/Upload";
 import Playlists from "./pages/Playlists";
 import CreatePlaylists from "./pages/CreatePlaylists";
+import SignInPage from "./pages/SignInPage";
+import SignUpPage from "./pages/SignUpPage";
 
 import "./App.css";
 
-function App() {
+function ProtectedApp() {
   return (
     <div className="app">
       <Navbar />
@@ -35,6 +42,30 @@ function App() {
 
       <MusicPlayer />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/sign-in/*" element={<SignInPage />} />
+      <Route path="/sign-up/*" element={<SignUpPage />} />
+
+      <Route
+        path="/*"
+        element={
+          <>
+            <SignedIn>
+              <ProtectedApp />
+            </SignedIn>
+
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
+          </>
+        }
+      />
+    </Routes>
   );
 }
 

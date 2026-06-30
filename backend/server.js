@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const { clerkMiddleware } = require("@clerk/express");
 
 const connectDB = require("./config/db");
 
