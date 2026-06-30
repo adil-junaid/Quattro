@@ -3,6 +3,7 @@ const router = express.Router();
 
 const Song = require("../models/song");
 const { ObjectId } = require("mongodb");
+const getBucket = require("../config/gridfs");
 
 // Songs
 router.get('/', async (req, res) => {
@@ -21,30 +22,64 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:songId/audio', async (req, res) => {
+router.get("/:songId/audio", async (req, res) => {
     try {
         const songId = req.params.songId;
 
-        // Ensure the songId is a valid ObjectId
         if (!ObjectId.isValid(songId)) {
-            return res.status(404).json({ error: 'Invalid song ID' });
+            return res.status(404).json({
+                error: "Invalid song ID"
+            });
         }
 
-        // Find the song in MongoDB
         const song = await Song.findById(songId);
+
         if (!song) {
-            return res.status(404).json({ error: 'Song not found' });
+            return res.status(404).json({
+                error: "Song not found"
+            });
         }
 
-        // Set the appropriate Content-Type header
-        res.set('Content-Type', 'audio/wav');
+        if (!song.fileId) {
+            return res.status(404).json({
+                error: "No audio file associated with this song"
+            });
+        }
 
-        // Stream the audio file from GridFS
-        const downloadStream = gfs.openDownloadStream(song.fileId);
+        const bucket = getBucket();
+
+        const files = await bucket.find({
+            _id: new ObjectId(song.fileId)
+        }).toArray();
+
+        if (files.length === 0) {
+            return res.status(404).json({
+                error: "Audio file not found"
+            });
+        }
+
+        res.set("Content-Type", files[0].contentType);
+
+        const downloadStream = bucket.openDownloadStream(
+            new ObjectId(song.fileId)
+        );
+
+        downloadStream.on("error", (err) => {
+            console.error(err);
+
+            res.status(500).json({
+                error: "Error streaming audio"
+            });
+        });
+
         downloadStream.pipe(res);
+
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Server error' });
+
+        res.status(500).json({
+            error: "Server error"
+        });
     }
 });
 
@@ -52,15 +87,15 @@ router.post('/', async (req, res) => {
     try {
         const { title, artist, album, duration, songcode, uploadedBy, fileId } = req.body;
 
-        const song = new Song({
-            title,
-            artist,
-            album,
-            duration,
-            songcode,
-            uploadedBy,
-            fileId
-        });
+    const song = new Song({
+        title,
+        artist,
+        album,
+        duration,
+        songcode,
+        uploadedBy,
+        fileId
+    });
         await song.save();
         res.json(song);
     } catch (err) {
