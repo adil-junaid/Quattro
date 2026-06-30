@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import api from "../services/api";
+import { MusicPlayerContext } from "../context/MusicPlayerContext";
 
 function Songs() {
   const [songs, setSongs] = useState([]);
+  const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { playSong } = useContext(MusicPlayerContext);
 
   useEffect(() => {
     fetchSongs();
+    fetchPlaylists();
   }, []);
 
   const fetchSongs = async () => {
@@ -20,11 +24,26 @@ function Songs() {
     }
   };
 
-  const playSong = (id) => {
-    const audio = new Audio(
-      `http://localhost:5000/api/songs/${id}/audio`
-    );
-    audio.play();
+  const fetchPlaylists = async () => {
+    try {
+      const res = await api.get("/playlists");
+      setPlaylists(res.data);
+    } catch (err) {
+      console.error("Error fetching playlists:", err);
+    }
+  };
+
+  const handleAddToPlaylist = async (songId, playlistId) => {
+    if (!playlistId) return;
+    try {
+      await api.put(`/playlists/${playlistId}/add-song`, { songId });
+      alert("✅ Song added to playlist successfully!");
+      // Refresh playlists to update song count
+      fetchPlaylists();
+    } catch (err) {
+      console.error("Error adding song to playlist:", err);
+      alert("❌ Failed to add song to playlist.");
+    }
   };
 
   if (loading) {
@@ -44,11 +63,26 @@ function Songs() {
               <h3>{song.title}</h3>
               <p><strong>Artist:</strong> {song.artist}</p>
               <p><strong>Album:</strong> {song.album}</p>
-              <p><strong>Duration:</strong> {song.duration} sec</p>
 
-              <button onClick={() => playSong(song._id)}>
+              <button onClick={() => playSong(song, songs)} className="play-button">
                 ▶ Play
               </button>
+
+              <select 
+                defaultValue="" 
+                onChange={(e) => {
+                  handleAddToPlaylist(song._id, e.target.value);
+                  e.target.value = "";
+                }}
+                className="playlist-select"
+              >
+                <option value="" disabled>➕ Add to Playlist</option>
+                {playlists.map((playlist) => (
+                  <option key={playlist._id} value={playlist._id}>
+                    {playlist.name}
+                  </option>
+                ))}
+              </select>
             </div>
           ))}
         </div>

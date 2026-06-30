@@ -4,12 +4,10 @@ import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import MusicPlayer from "./components/MusicPlayer";
 
-import Home from "./pages/Home";
 import Songs from "./pages/Songs";
 import Upload from "./pages/Upload";
 import Playlists from "./pages/Playlists";
 import CreatePlaylists from "./pages/CreatePlaylists";
-import Profile from "./pages/Profile";
 
 import "./App.css";
 
@@ -23,7 +21,7 @@ function App() {
 
         <div className="content">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Songs />} />
             <Route path="/songs" element={<Songs />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/playlists" element={<Playlists />} />
@@ -31,7 +29,6 @@ function App() {
               path="/create-playlist"
               element={<CreatePlaylists />}
             />
-            <Route path="/profile" element={<Profile />} />
           </Routes>
         </div>
       </div>

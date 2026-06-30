@@ -115,4 +115,32 @@ router.get("/collaborative/:userId", async (req, res) => {
     }
 });
 
+// Add song to playlist
+router.put("/:playlistId/add-song", async (req, res) => {
+    try {
+        const { songId } = req.body;
+        if (!ObjectId.isValid(req.params.playlistId)) {
+            return res.status(400).json({ error: "Invalid playlist ID" });
+        }
+        if (!ObjectId.isValid(songId)) {
+            return res.status(400).json({ error: "Invalid song ID" });
+        }
+
+        const playlist = await Playlist.findByIdAndUpdate(
+            req.params.playlistId,
+            { $addToSet: { songs: songId } },
+            { new: true }
+        ).populate("songs");
+
+        if (!playlist) {
+            return res.status(404).json({ error: "Playlist not found" });
+        }
+
+        res.json(playlist);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 module.exports = router;

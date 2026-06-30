@@ -6,8 +6,6 @@ function Upload() {
     title: "",
     artist: "",
     album: "",
-    duration: "",
-    songcode: "",
     uploadedBy: ""
   });
 
@@ -49,7 +47,6 @@ function Upload() {
       // Save song metadata
       await api.post("/songs", {
         ...form,
-        duration: Number(form.duration),
         fileId
       });
 
@@ -59,8 +56,6 @@ function Upload() {
         title: "",
         artist: "",
         album: "",
-        duration: "",
-        songcode: "",
         uploadedBy: ""
       });
 
@@ -77,7 +72,7 @@ function Upload() {
   return (
     <div className="upload-page">
 
-      <h1>Upload Song</h1>
+      <h1>Upload Songs</h1>
 
       <form className="upload-form" onSubmit={handleUpload}>
 
@@ -105,23 +100,6 @@ function Upload() {
         />
 
         <input
-          name="duration"
-          type="number"
-          placeholder="Duration (seconds)"
-          value={form.duration}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="songcode"
-          placeholder="Song Code"
-          value={form.songcode}
-          onChange={handleChange}
-          required
-        />
-
-        <input
           name="uploadedBy"
           placeholder="Uploaded By"
           value={form.uploadedBy}
@@ -136,7 +114,7 @@ function Upload() {
         />
 
         <button disabled={loading}>
-          {loading ? "Uploading..." : "Upload Song"}
+          {loading ? "Uploading..." : "Upload Songs"}
         </button>
 
       </form>
