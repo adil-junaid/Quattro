@@ -20,10 +20,11 @@ router.get("/", requireAuth(), async (req, res) => {
 });
 
 // Get songs in a playlist
-router.get("/:playlistName/songs", async (req, res) => {
+router.get("/:playlistName/songs", requireAuth(), async (req, res) => {
     try {
         const playlist = await Playlist.findOne({
             name: req.params.playlistName,
+            owner: req.auth.userId
         }).populate("songs");
 
         if (!playlist) {
@@ -81,48 +82,9 @@ router.post("/", requireAuth(), async (req, res) => {
     }
 });
 
-// Add collaborator
-router.post("/:playlistId/collaborators", async (req, res) => {
-    try {
-        const { userId } = req.body;
-
-        const playlist = await Playlist.findByIdAndUpdate(
-            req.params.playlistId,
-            {
-                $addToSet: {
-                    collaborators: userId,
-                },
-            },
-            { new: true }
-        );
-
-        res.json(playlist);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            error: "Server error",
-        });
-    }
-});
-
-// Get collaborative playlists
-router.get("/collaborative/:userId", async (req, res) => {
-    try {
-        const playlists = await Playlist.find({
-            collaborators: req.params.userId,
-        });
-
-        res.json(playlists);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            error: "Server error",
-        });
-    }
-});
 
 // Add song to playlist
-router.put("/:playlistId/add-song", async (req, res) => {
+router.put("/:playlistId/add-song", requireAuth(), async (req, res) => {
     try {
         const { songId } = req.body;
         if (!ObjectId.isValid(req.params.playlistId)) {
@@ -132,10 +94,19 @@ router.put("/:playlistId/add-song", async (req, res) => {
             return res.status(400).json({ error: "Invalid song ID" });
         }
 
-        const playlist = await Playlist.findByIdAndUpdate(
-            req.params.playlistId,
-            { $addToSet: { songs: songId } },
-            { new: true }
+        const playlist = await Playlist.findOneAndUpdate(
+            {
+                _id: req.params.playlistId,
+                owner: req.auth.userId
+            },
+            {
+                $addToSet: {
+                    songs: songId
+                }
+            },
+            {
+                new: true
+            }
         ).populate("songs");
 
         if (!playlist) {
