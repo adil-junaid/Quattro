@@ -7,9 +7,11 @@ const Song = require("../models/song");
 const { ObjectId } = require("mongodb");
 
 // Get all playlists
-router.get("/", async (req, res) => {
+router.get("/", requireAuth(), async (req, res) => {
     try {
-        const playlists = await Playlist.find().populate("songs");
+        const playlists = await Playlist.find({
+            owner: req.auth.userId
+        }).populate("songs");
         res.json(playlists);
     } catch (err) {
         console.error(err);
@@ -40,6 +42,7 @@ router.get("/:playlistName/songs", async (req, res) => {
 });
 
 // Create playlist
+// Create playlist
 router.post("/", requireAuth(), async (req, res) => {
     try {
         const { name, songs = [] } = req.body;
@@ -48,14 +51,14 @@ router.post("/", requireAuth(), async (req, res) => {
 
         if (songs.length > 0) {
             const existingSongs = await Song.find({
-                title: { $in: songs },
+                title: { $in: songs }
             });
 
             songIds = existingSongs.map((song) => song._id);
 
             if (existingSongs.length !== songs.length) {
                 return res.status(400).json({
-                    error: "Some songs were not found",
+                    error: "Some songs were not found"
                 });
             }
         }
@@ -63,15 +66,17 @@ router.post("/", requireAuth(), async (req, res) => {
         const playlist = new Playlist({
             name,
             songs: songIds,
+            owner: req.auth.userId
         });
 
         await playlist.save();
 
         res.status(201).json(playlist);
+
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            error: "Server error",
+            error: "Server error"
         });
     }
 });
@@ -145,7 +150,7 @@ router.put("/:playlistId/add-song", async (req, res) => {
 });
 
 // Delete playlist
-router.delete("/:playlistId", async (req, res) => {
+router.delete("/:playlistId", requireAuth(), async (req, res) => {
     try {
         if (!ObjectId.isValid(req.params.playlistId)) {
             return res.status(400).json({
@@ -153,9 +158,10 @@ router.delete("/:playlistId", async (req, res) => {
             });
         }
 
-        const playlist = await Playlist.findByIdAndDelete(
-            req.params.playlistId
-        );
+        const playlist = await Playlist.findOneAndDelete({
+            _id: req.params.playlistId,
+            owner: req.auth.userId
+        });
 
         if (!playlist) {
             return res.status(404).json({
