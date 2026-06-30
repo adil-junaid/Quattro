@@ -162,4 +162,29 @@ router.delete("/:id", async (req, res) => {
 });
 
 
+// Stream song audio
+router.get("/:songId/audio", async (req, res) => {
+    try {
+        const songId = req.params.songId;
+
+        if (!ObjectId.isValid(songId)) {
+            return res.status(404).json({ error: 'Invalid song ID' });
+        }
+
+        const song = await Song.findById(songId);
+        if (!song) {
+            return res.status(404).json({ error: 'Song not found' });
+        }
+
+        res.set('Content-Type', 'audio/wav');
+
+        const bucket = getBucket();
+        const downloadStream = bucket.openDownloadStream(song.fileId);
+        downloadStream.pipe(res);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 module.exports = router;

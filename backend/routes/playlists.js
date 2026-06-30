@@ -15,34 +15,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/api/songs/:songId/audio', async (req, res) => {
-    try {
-        const songId = req.params.songId;
-
-        // Ensure the songId is a valid ObjectId
-        if (!ObjectId.isValid(songId)) {
-            return res.status(404).json({ error: 'Invalid song ID' });
-        }
-
-        // Find the song in MongoDB
-        const song = await Song.findById(songId);
-        if (!song) {
-            return res.status(404).json({ error: 'Song not found' });
-        }
-
-        // Set the routerropriate Content-Type header
-        res.set('Content-Type', 'audio/wav');
-        // Modify the Content-Type as per your file format
-
-        // Stream the audio file from GridFS
-        const downloadStream = gfs.openDownloadStream(song.fileId);
-        // Assuming fileId is the ID of the audio file in GridFS
-        downloadStream.pipe(res);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
 
 router.get('/:playlistName/songs', async (req, res) => {
     try {
