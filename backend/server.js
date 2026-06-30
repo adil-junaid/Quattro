@@ -1,20 +1,18 @@
 require("dotenv").config();
-const express=require("express");
-const cors=require("cors");
-const mongoose=require("mongoose");
-const multer=require("multer");
-const shortid=require("shortid");
-const { GridFsStorage }=require("multer-gridfs-storage");
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const multer = require("multer");
+const shortid = require("shortid");
 
-const connectDB=require("./config/db");
+const connectDB = require("./config/db");
 
-const app=express();
+const app = express();
 
 // Set globals so they are accessible to models/routes without standard imports
 global.mongoose = mongoose;
 global.multer = multer;
 global.shortid = shortid;
-global.GridFsStorage = GridFsStorage;
 global.app = app;
 global.ObjectId = mongoose.Types.ObjectId;
 
@@ -22,11 +20,11 @@ global.ObjectId = mongoose.Types.ObjectId;
 require("./models/songs");
 require("./models/playlist");
 
-// Retrieve Models & Set Globals
+// Retrieve Models & Set Globals for routes to use
 global.Song = mongoose.model("Song");
 global.Playlist = mongoose.model("Playlist");
 
-// Initialize GridFS globally once DB connects
+// Initialize GridFS bucket globally once DB is open
 mongoose.connection.once("open", () => {
     global.gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
         bucketName: "uploads"
@@ -39,10 +37,23 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// Load Routes
+// Load Routes (which register endpoints directly on the global `app`)
 require("./routes/songs");
 require("./routes/playlists");
+app.use("/api/upload", require("./routes/upload"));
 
-app.listen(process.env.PORT || 5000,()=>{
- console.log("Server Running");
+// Error Handler
+const errorMiddleware = require("./middleware/errorMiddleware");
+app.use(errorMiddleware);
+
+// Home Route
+app.get("/", (req, res) => {
+    res.send("Music API Running");
+});
+
+// Start Server
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}\n`);
 });
