@@ -50,14 +50,16 @@ router.get('/:songId/audio', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { title, artist, album, duration, songcode, uploadedBy } = req.body;
+        const { title, artist, album, duration, songcode, uploadedBy, fileId } = req.body;
+
         const song = new Song({
             title,
             artist,
             album,
             duration,
             songcode,
-            uploadedBy
+            uploadedBy,
+            fileId
         });
         await song.save();
         res.json(song);
