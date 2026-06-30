@@ -3,7 +3,7 @@ import api from "../services/api";
 import PlaylistCard from "../components/PlaylistCard";
 import { useAuth } from "@clerk/clerk-react";
 
-const HAS_CLERK = !!process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+const HAS_CLERK = !!process.env.REACT_APP_CLERK_PUBLISHABLE_KEY && !process.env.REACT_APP_CLERK_PUBLISHABLE_KEY.includes("...");
 
 function LibraryContent({ userId }) {
     const activeUserId = userId || "guest_user";
